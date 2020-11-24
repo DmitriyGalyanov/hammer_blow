@@ -64,36 +64,6 @@ export default function GameScreen() {
 	const hammer_down_height = gameHeight * 0.14;
 	const hammer_down_width = hammer_down_height * 1.2;
 
-	//hammer anim
-	const hammer_init_opacity = useRef(new Animated.Value(1)).current;
-	const hammer_mid_opacity = useRef(new Animated.Value(0)).current;
-	const hammer_down_opacity = useRef(new Animated.Value(0)).current;
-
-	const animHammerBlow = (animStep) => {
-		changeValueAnim(hammer_init_opacity, 0, animStep);
-		setTimeout(() => changeValueAnim(hammer_mid_opacity, 1, animStep), animStep);
-		setTimeout(() => changeValueAnim(hammer_mid_opacity, 0, animStep), animStep * 2);
-		setTimeout(() => changeValueAnim(hammer_down_opacity, 1, animStep), animStep * 3);
-	};
-	const animHammerRevert = (animStep) => {
-		changeValueAnim(hammer_init_opacity, 1, animStep);
-		changeValueAnim(hammer_mid_opacity, 0, animStep);
-		changeValueAnim(hammer_down_opacity, 0, animStep * 2);
-	};
-
-	const handleSmash = () => {
-		const animStep = 200;
-		animHammerBlow(animStep);
-		if (vibrationData.isActive) {
-			setTimeout(() => {
-				Vibration.vibrate();
-				//check if the line hits the coin, then set new coin position and let it appear in x seconds
-			}, animStep * 3.5);
-		};
-
-		setTimeout(() => animHammerRevert(animStep), animStep * 8)
-	};
-
 	//game area dimensions
 	const coinDiameter = gameHeight / 24;
 
@@ -112,16 +82,34 @@ export default function GameScreen() {
 
 	const greenLinePosition = useRef(new Animated.Value(0)).current;
 
+	const [isStopped, setIsStopped] = useState(false);
+	const [isBusy, setIsBusy] = useState(false);
+
 	useEffect(() => {
+		// if (isStopped) {
+		// 	console.log('STOPPPPED')
+		// 	// clearInterval(greenLineAnimInterval); //is it allowed??
+		// 	// return;
+		// };
+		// if (isBusy) {
+		// 	console.log('bussssyyyy')
+		// 	return;
+		// };
+
 		const greenLineAnimInterval = setInterval(() => {
+			// console.log(greenLinePosition)
+			if (isStopped) return;
 			changeValueAnim(greenLinePosition, getRandomInt(0, playableAreaHeight), 600)
 		}, 600);
 
 		return () => {
 			clearInterval(greenLineAnimInterval);
 		};
-	}, []); //something like isTouched
-	
+	}, [isStopped, isBusy]);
+
+	useEffect(() => {
+
+	}, [isStopped]);
 
 	//check if the line hits the coin
 	const checkIfSuccess = () => {
@@ -140,11 +128,58 @@ export default function GameScreen() {
 		};
 	};
 
+	//hammer anim
+
+	const hammer_init_opacity = useRef(new Animated.Value(1)).current;
+	const hammer_mid_opacity = useRef(new Animated.Value(0)).current;
+	const hammer_down_opacity = useRef(new Animated.Value(0)).current;
+
+	const animHammerBlow = (animStep) => {
+		changeValueAnim(hammer_init_opacity, 0, animStep);
+		setTimeout(() => changeValueAnim(hammer_mid_opacity, 1, animStep), animStep);
+		setTimeout(() => changeValueAnim(hammer_mid_opacity, 0, animStep), animStep * 2);
+		setTimeout(() => changeValueAnim(hammer_down_opacity, 1, animStep), animStep * 3);
+	};
+	const animHammerRevert = (animStep) => {
+		setIsBusy(true);
+		changeValueAnim(hammer_init_opacity, 1, animStep);
+		changeValueAnim(hammer_mid_opacity, 0, animStep);
+		changeValueAnim(hammer_down_opacity, 0, animStep * 2);
+		setTimeout(() => {
+			setIsStopped(false);
+			setIsBusy(false);
+		}, animStep * 2);
+	};
+
+	//smash handler
+
+	const handleSmash = () => {
+		if (isBusy) return;
+		if (isStopped) {
+			animHammerRevert(animStep);
+			// setIsStopped(false);
+			return;
+		};
+		setIsBusy(true);
+
+		const animStep = 200;
+		animHammerBlow(animStep);
+		if (vibrationData.isActive) {
+			setTimeout(() => {
+				Vibration.vibrate();
+				//check if the line hits the coin, then set new coin position and let it appear in x seconds
+				setIsStopped(true);
+				setIsBusy(false);
+			}, animStep * 2.5);
+		};
+	};
+
 	return (
 		<TouchableOpacity
 			style={styles.wrap}
 			activeOpacity={0.9}
 			onPress={handleSmash}
+			disabled={isBusy}
 		>
 			<ImageBackground
 				source={background}
@@ -191,7 +226,7 @@ export default function GameScreen() {
 								width: greenLineWidth,
 								backgroundColor: 'green',
 								position: 'absolute',
-								bottom: greenLinePosition,//greenLinePosition
+								bottom: greenLinePosition,
 							}
 						]}
 					/>
