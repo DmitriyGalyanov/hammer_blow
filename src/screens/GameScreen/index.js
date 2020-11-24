@@ -24,6 +24,7 @@ import gameImage from 'images/gameImage.png';
 import hammer_init from 'images/hammer_init.png';
 import hammer_mid from 'images/hammer_mid.png';
 import hammer_down from 'images/hammer_down.png';
+import coin from 'images/coin.png';
 
 
 function changeValueAnim(target, toValue, duration) {
@@ -65,7 +66,7 @@ export default function GameScreen() {
 	const hammer_down_width = hammer_down_height * 1.2;
 
 	//game area dimensions
-	const coinDiameter = gameHeight / 24;
+	const coinDiameter = gameHeight / 10;
 
 	const playableAreaDims = {
 		top: (gameHeight * 0.71) - (coinDiameter * 0.5),
@@ -74,10 +75,12 @@ export default function GameScreen() {
 	};
 	const playableAreaHeight = playableAreaDims.top - playableAreaDims.bot;
 
-	const coinPosition = useState(getRandomInt(0, playableAreaHeight)); //mb use opacity?
+	// const coinPosition = useState(getRandomInt(0, playableAreaHeight)); //mb use opacity?
+	const coinPosition = useRef(new Animated.Value(getRandomInt(0, playableAreaHeight))).current;
+	const coinOpacity = useRef(new Animated.Value(1)).current;
 
 	//green line appearance
-	const greenLineHeight = coinDiameter * 0.75;
+	const greenLineHeight = coinDiameter * 0.5;
 	const greenLineWidth = playableAreaDims.width;
 
 	const greenLinePosition = useRef(new Animated.Value(0)).current;
@@ -86,92 +89,113 @@ export default function GameScreen() {
 	const [isBusy, setIsBusy] = useState(false);
 
 	useEffect(() => {
-		// if (isStopped) {
-		// 	console.log('STOPPPPED')
-		// 	// clearInterval(greenLineAnimInterval); //is it allowed??
-		// 	// return;
-		// };
-		// if (isBusy) {
-		// 	console.log('bussssyyyy')
-		// 	return;
-		// };
-
 		const greenLineAnimInterval = setInterval(() => {
-			// console.log(greenLinePosition)
+			console.log('Green Line Poisition: ', greenLinePosition, 'Coin Position:', coinPosition)
 			if (isStopped) return;
-			changeValueAnim(greenLinePosition, getRandomInt(0, playableAreaHeight), 600)
-		}, 600);
+			changeValueAnim(greenLinePosition, getRandomInt(0, playableAreaHeight), 300)
+		}, 300);
 
 		return () => {
 			clearInterval(greenLineAnimInterval);
 		};
 	}, [isStopped, isBusy]);
 
-	useEffect(() => {
-
-	}, [isStopped]);
-
 	//check if the line hits the coin
 	const checkIfSuccess = () => {
-		if (coinPosition - (coinDiameter * 0.5) <= greenLinePosition <= coinPosition + (coinDiameter * 0.5)) {
-			console.log('success');
-			return true;
-		}
-		console.log('fail');
-		return false;
+		// console.log(`${coinPosition.__getValue()} - (${coinDiameter} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${greenLineHeight} * 0.95)`)
+		setTimeout(() => {
+			console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`)
+			if (coinPosition.__getValue() - (greenLineHeight * 0.95) <= greenLinePosition.__getValue()
+				&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (coinDiameter * 0.95)) {
+				console.log('success');
+				return true;
+			}
+			console.log('fail');
+			return false;
+		}, 100);
+		// if (coinPosition.__getValue() - (coinDiameter * 0.95) <= greenLinePosition.__getValue()
+		// 	&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (greenLineHeight * 0.95)) {
+		// 	console.log('success');
+		// 	return true;
+		// }
+		// console.log('fail');
+		// return false;
 	};
 
-	const handleSuccess = () => {
-		if (checkIfSuccess()) { //is it allowed??
-			console.log('for real');
-			dispatch(increaseScore({amount: 1}));
-		};
-	};
+	// const handleSuccess = () => {
+	// 	console.log('going to handle...')
+	// 	if (checkIfSuccess()) { //is it allowed??
+	// 		console.log('handling///');
+	// 		dispatch(increaseScore({amount: 1}));
+	// 	};
+	// };
 
 	//hammer anim
-
 	const hammer_init_opacity = useRef(new Animated.Value(1)).current;
 	const hammer_mid_opacity = useRef(new Animated.Value(0)).current;
 	const hammer_down_opacity = useRef(new Animated.Value(0)).current;
 
-	const animHammerBlow = (animStep) => {
+	const animStep = 200;
+
+	const animHammerBlow = () => {
 		changeValueAnim(hammer_init_opacity, 0, animStep);
 		setTimeout(() => changeValueAnim(hammer_mid_opacity, 1, animStep), animStep);
 		setTimeout(() => changeValueAnim(hammer_mid_opacity, 0, animStep), animStep * 2);
 		setTimeout(() => changeValueAnim(hammer_down_opacity, 1, animStep), animStep * 3);
 	};
-	const animHammerRevert = (animStep) => {
+	const animHammerRevert = () => {
 		setIsBusy(true);
 		changeValueAnim(hammer_init_opacity, 1, animStep);
 		changeValueAnim(hammer_mid_opacity, 0, animStep);
 		changeValueAnim(hammer_down_opacity, 0, animStep * 2);
+	};
+
+	//
+	const resetCoinPosition = () => {
+		changeValueAnim(coinOpacity, 0, animStep);
+		setTimeout(() => {
+			changeValueAnim(coinPosition, getRandomInt(0, playableAreaHeight), 10);
+			changeValueAnim(coinOpacity, 1, animStep);
+		}, animStep);
+	};
+
+	//
+	const startNextRound = () => {
+		animHammerRevert();
+		resetCoinPosition();
 		setTimeout(() => {
 			setIsStopped(false);
-			setIsBusy(false);
+			// setIsBusy(false);
 		}, animStep * 2);
+		setTimeout(() => {
+			setIsBusy(false);
+		}, animStep * 4);
 	};
 
 	//smash handler
-
 	const handleSmash = () => {
 		if (isBusy) return;
 		if (isStopped) {
-			animHammerRevert(animStep);
-			// setIsStopped(false);
+			startNextRound();
 			return;
 		};
 		setIsBusy(true);
 
-		const animStep = 200;
-		animHammerBlow(animStep);
-		if (vibrationData.isActive) {
-			setTimeout(() => {
+		animHammerBlow();
+		setTimeout(() => {
+			if (vibrationData.isActive) {
 				Vibration.vibrate();
-				//check if the line hits the coin, then set new coin position and let it appear in x seconds
-				setIsStopped(true);
-				setIsBusy(false);
-			}, animStep * 2.5);
-		};
+			};
+			setIsStopped(true);
+			// setIsBusy(false);
+		}, animStep * 2.5);
+
+		setTimeout(() => {
+			if (checkIfSuccess()) {
+				dispatch(increaseScore({amount: 1}));
+			};
+			setIsBusy(false);
+		}, animStep * 3);
 	};
 
 	return (
@@ -213,7 +237,7 @@ export default function GameScreen() {
 							position: 'absolute',
 							bottom: playableAreaDims.bot,
 							height: playableAreaHeight,
-							backgroundColor: 'yellow',
+							// backgroundColor: 'yellow',
 							width: playableAreaDims.width,
 						}
 					]}
@@ -230,6 +254,23 @@ export default function GameScreen() {
 							}
 						]}
 					/>
+					<Animated.View
+						style={{
+							opacity: coinOpacity,
+							position: 'absolute',
+							bottom: coinPosition,
+							width: playableAreaDims.width,
+							alignItems: 'center',
+						}}
+					>
+						<Image
+							source={coin}
+							style={{
+								width: coinDiameter,
+								height: coinDiameter,
+							}}
+						/>
+					</Animated.View>
 				</View>
 				<View //hammer images
 					style={{
