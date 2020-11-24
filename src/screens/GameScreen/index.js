@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {
 	TouchableOpacity,
@@ -93,7 +93,7 @@ export default function GameScreen() {
 
 		setTimeout(() => animHammerRevert(animStep), animStep * 8)
 	};
-	
+
 	//game area dimensions
 	const coinDiameter = gameHeight / 24;
 
@@ -104,31 +104,41 @@ export default function GameScreen() {
 	};
 	const playableAreaHeight = playableAreaDims.top - playableAreaDims.bot;
 
-	// const coinPosition = useState(getRandomInt(playableAreaDims.bot, playableAreaDims.top)); //mb use opacity?
+	const coinPosition = useState(getRandomInt(0, playableAreaHeight)); //mb use opacity?
 
 	//green line appearance
 	const greenLineHeight = coinDiameter * 0.75;
 	const greenLineWidth = playableAreaDims.width;
 
 	const greenLinePosition = useRef(new Animated.Value(0)).current;
+
+	useEffect(() => {
+		const greenLineAnimInterval = setInterval(() => {
+			changeValueAnim(greenLinePosition, getRandomInt(0, playableAreaHeight), 600)
+		}, 600);
+
+		return () => {
+			clearInterval(greenLineAnimInterval);
+		};
+	}, []); //something like isTouched
 	
 
 	//check if the line hits the coin
-	// const checkIfSuccess = () => {
-	// 	if (coinPosition - (coinDiameter * 0.5) <= greenLinePosition <= coinPosition + (coinDiameter * 0.5)) {
-	// 		console.log('success');
-	// 		return true;
-	// 	}
-	// 	console.log('fail');
-	// 	return false;
-	// };
+	const checkIfSuccess = () => {
+		if (coinPosition - (coinDiameter * 0.5) <= greenLinePosition <= coinPosition + (coinDiameter * 0.5)) {
+			console.log('success');
+			return true;
+		}
+		console.log('fail');
+		return false;
+	};
 
-	// const handleSuccess = () => {
-	// 	if (checkIfSuccess()) { //is it allowed??
-	// 		console.log('for real');
-	// 		dispatch(increaseScore({amount: 1}));
-	// 	};
-	// };
+	const handleSuccess = () => {
+		if (checkIfSuccess()) { //is it allowed??
+			console.log('for real');
+			dispatch(increaseScore({amount: 1}));
+		};
+	};
 
 	return (
 		<TouchableOpacity
@@ -181,7 +191,7 @@ export default function GameScreen() {
 								width: greenLineWidth,
 								backgroundColor: 'green',
 								position: 'absolute',
-								bottom: 10,//greenLinePosition
+								bottom: greenLinePosition,//greenLinePosition
 							}
 						]}
 					/>
