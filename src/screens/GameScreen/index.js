@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 
 import {
 	TouchableOpacity,
@@ -26,7 +26,7 @@ import hammer_mid from 'images/hammer_mid.png';
 import hammer_down from 'images/hammer_down.png';
 
 
-export function changeValueAnim(target, toValue, duration) {
+function changeValueAnim(target, toValue, duration) {
 	Animated.timing(target, {
 		toValue: toValue,
 		duration: duration,
@@ -34,8 +34,16 @@ export function changeValueAnim(target, toValue, duration) {
 	}).start();
 };
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+};
+
 export default function GameScreen() {
 	const dispatch = useDispatch();
+
+	const {width: gameWidth} = Dimensions.get('window');
 
 	const {value: scoreCount} = useSelector(selectScoreData);
 
@@ -44,7 +52,7 @@ export default function GameScreen() {
 		sound: soundData,
 	} = useSelector(selectSettingsData);
 
-	const {width: gameWidth} = Dimensions.get('window');
+	//hammer dimensions
 	const gameHeight = gameWidth * 1.96;
 
 	const hammer_init_height = gameHeight * 0.24;
@@ -56,22 +64,16 @@ export default function GameScreen() {
 	const hammer_down_height = gameHeight * 0.14;
 	const hammer_down_width = hammer_down_height * 1.2;
 
-	const handleSuccess = () => {
-		dispatch(increaseScore({amount: 1}));
-	};
-
 	//hammer anim
 	const hammer_init_opacity = useRef(new Animated.Value(1)).current;
 	const hammer_mid_opacity = useRef(new Animated.Value(0)).current;
 	const hammer_down_opacity = useRef(new Animated.Value(0)).current;
 
 	const animHammerBlow = (animStep) => {
-		
 		changeValueAnim(hammer_init_opacity, 0, animStep);
 		setTimeout(() => changeValueAnim(hammer_mid_opacity, 1, animStep), animStep);
 		setTimeout(() => changeValueAnim(hammer_mid_opacity, 0, animStep), animStep * 2);
 		setTimeout(() => changeValueAnim(hammer_down_opacity, 1, animStep), animStep * 3);
-		
 	};
 	const animHammerRevert = (animStep) => {
 		changeValueAnim(hammer_init_opacity, 1, animStep);
@@ -85,14 +87,48 @@ export default function GameScreen() {
 		if (vibrationData.isActive) {
 			setTimeout(() => {
 				Vibration.vibrate();
-				//check if the line hits the coin
+				//check if the line hits the coin, then set new coin position and let it appear in x seconds
 			}, animStep * 3.5);
-		}
-
+		};
 
 		setTimeout(() => animHammerRevert(animStep), animStep * 8)
-
 	};
+	
+	//game area dimensions
+	const coinDiameter = gameHeight / 24;
+
+	const playableAreaDims = {
+		top: (gameHeight * 0.71) - (coinDiameter * 0.5),
+		bot: (gameHeight * 0.25) + (coinDiameter * 0.5),
+		width: gameWidth * 0.314,
+	};
+	const playableAreaHeight = playableAreaDims.top - playableAreaDims.bot;
+
+	// const coinPosition = useState(getRandomInt(playableAreaDims.bot, playableAreaDims.top)); //mb use opacity?
+
+	//green line appearance
+	const greenLineHeight = coinDiameter * 0.75;
+	const greenLineWidth = playableAreaDims.width;
+
+	const greenLinePosition = useRef(new Animated.Value(0)).current;
+	
+
+	//check if the line hits the coin
+	// const checkIfSuccess = () => {
+	// 	if (coinPosition - (coinDiameter * 0.5) <= greenLinePosition <= coinPosition + (coinDiameter * 0.5)) {
+	// 		console.log('success');
+	// 		return true;
+	// 	}
+	// 	console.log('fail');
+	// 	return false;
+	// };
+
+	// const handleSuccess = () => {
+	// 	if (checkIfSuccess()) { //is it allowed??
+	// 		console.log('for real');
+	// 		dispatch(increaseScore({amount: 1}));
+	// 	};
+	// };
 
 	return (
 		<TouchableOpacity
@@ -104,7 +140,7 @@ export default function GameScreen() {
 				source={background}
 				style={styles.background}
 			>
-				<ImageBackground
+				<ImageBackground //game image
 					source={gameImage}
 					style={{
 						position: 'absolute',
@@ -125,7 +161,32 @@ export default function GameScreen() {
 					{scoreCount}
 					</Text>
 				</ImageBackground>
-				<View
+				<View //playable area
+					style={[
+						styles.playableArea,
+						{
+							position: 'absolute',
+							bottom: playableAreaDims.bot,
+							height: playableAreaHeight,
+							backgroundColor: 'yellow',
+							width: playableAreaDims.width,
+						}
+					]}
+				>
+					<Animated.View
+						style={[
+							styles.greenLine,
+							{
+								height: greenLineHeight,
+								width: greenLineWidth,
+								backgroundColor: 'green',
+								position: 'absolute',
+								bottom: 10,//greenLinePosition
+							}
+						]}
+					/>
+				</View>
+				<View //hammer images
 					style={{
 						position: 'absolute',
 						height: hammer_init_height,
@@ -175,8 +236,9 @@ export default function GameScreen() {
 							}}
 						/>
 					</Animated.View>
-
+					
 				</View>
+
 			</ImageBackground>
 		</TouchableOpacity>
 	)
