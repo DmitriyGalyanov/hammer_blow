@@ -57,10 +57,7 @@ const styles = StyleSheet.create({
 		width: 120,
 	},
 
-	buttonsWrap: {
-		// height: 138,
-		// justifyContent: 'space-between',
-	},
+	buttonsWrap: {},
 
 	buttonWrap: {
 		marginBottom: 32,

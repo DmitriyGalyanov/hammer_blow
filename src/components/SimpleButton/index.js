@@ -31,8 +31,8 @@ export default function SimpleButton({title, onPress}) {
 
 const styles = StyleSheet.create({
 	wrap: {
-		width: 193.5,
-		height: 54,
+		width: 290,
+		height: 81,
 	},
 
 	background: {
