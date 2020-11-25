@@ -3,9 +3,12 @@ import React from 'react';
 import {
 	StyleSheet,
 	ImageBackground,
-	Image,
+	Text,
 	View,
 } from 'react-native';
+
+import {useSelector, useDispatch} from 'react-redux';
+import {selectScoreData, resetScore} from 'state_slices/scoreSlice';
 
 import {useNavigation} from '@react-navigation/native';
 
@@ -16,17 +19,29 @@ import coin from 'images/coin.png';
 
 
 export default function SecondaryMenuScreen() {
+	const dispatch = useDispatch();
 	const navigation = useNavigation();
+
+	const {value: scoreCount} = useSelector(selectScoreData);
+
+	const handleRestart = () => {
+		dispatch(resetScore());
+		navigation.push('Game');
+	};
 
 	return (
 		<ImageBackground
 			source={background}
 			style={styles.wrap}
 		>
-			<Image
+			<ImageBackground
 				source={coin}
 				style={styles.coinImage}
-			/>
+			>
+				<Text style={styles.scoreCount}>
+					{scoreCount}
+				</Text>
+			</ImageBackground>
 			<View style={styles.buttonsWrap}>
 				<View style={styles.buttonWrap}>
 					<SimpleButton
@@ -37,7 +52,7 @@ export default function SecondaryMenuScreen() {
 				<View style={styles.buttonWrap}>
 					<SimpleButton
 						title='Рестарт'
-						onPress={() => navigation.push('Game')}
+						onPress={handleRestart}
 					/>
 				</View>
 			</View>
@@ -55,6 +70,13 @@ const styles = StyleSheet.create({
 	coinImage: {
 		height: 120,
 		width: 120,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+
+	scoreCount: {
+		color: '#fff',
+		fontSize: 34,
 	},
 
 	buttonsWrap: {},

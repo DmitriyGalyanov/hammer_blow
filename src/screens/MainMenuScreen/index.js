@@ -62,9 +62,9 @@ export default function MainMenuScreen() {
 					/>
 				</View>
 				<SimpleButton
-					title='Secondary Menu'
+					title='Старт'
 					onPress={() => {
-						navigation.push('SecondaryMenu')
+						navigation.push('Game')
 					}}
 				/>
 			</View>
