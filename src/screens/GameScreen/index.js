@@ -101,18 +101,35 @@ export default function GameScreen() {
 	}, [isStopped, isBusy]);
 
 	//check if the line hits the coin
+	// const checkIfSuccess = () => {
+	// 	// console.log(`${coinPosition.__getValue()} - (${coinDiameter} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${greenLineHeight} * 0.95)`)
+	// 	setTimeout(() => {
+	// 		console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`)
+	// 		if (coinPosition.__getValue() - (greenLineHeight * 0.95) <= greenLinePosition.__getValue()
+	// 			&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (coinDiameter * 0.95)) {
+	// 			console.log('success');
+	// 			return true;
+	// 		}
+	// 		console.log('fail');
+	// 		return false;
+	// 	}, 100);
+	// };
 	const checkIfSuccess = () => {
 		// console.log(`${coinPosition.__getValue()} - (${coinDiameter} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${greenLineHeight} * 0.95)`)
-		setTimeout(() => {
-			console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`)
-			if (coinPosition.__getValue() - (greenLineHeight * 0.95) <= greenLinePosition.__getValue()
-				&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (coinDiameter * 0.95)) {
-				console.log('success');
-				return true;
-			}
-			console.log('fail');
-			return false;
-		}, 100);
+		return new Promise((resolve, reject) => {
+			setTimeout(() => {
+				console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`)
+				if (coinPosition.__getValue() - (greenLineHeight * 0.95) <= greenLinePosition.__getValue()
+					&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (coinDiameter * 0.95)) {
+					console.log('success');
+					resolve(true);
+				} else {
+					console.log('fail');
+					resolve(false);
+				};
+			}, 100);
+		})
+
 	};
 
 	//hammer anim
@@ -158,7 +175,7 @@ export default function GameScreen() {
 	};
 
 	//smash handler
-	const handleSmash = () => {
+	const handleSmash = async () => {
 		if (isBusy) return;
 		if (isStopped) {
 			startNextRound();
@@ -178,10 +195,13 @@ export default function GameScreen() {
 		setTimeout(() => {
 			console.log('checking')
 			console.log(checkIfSuccess())
-			if (checkIfSuccess()) {
-				console.log('yi')
-				dispatch(increaseScore({amount: 1}));
-			};
+			// if (checkIfSuccess()) {
+			// 	console.log('yi')
+			// 	dispatch(increaseScore({amount: 1}));
+			// };
+			checkIfSuccess().then(isSuccess => {
+				if (isSuccess) dispatch(increaseScore({amount: 1}));
+			});
 			setIsBusy(false);
 		}, animStep * 3);
 	};
