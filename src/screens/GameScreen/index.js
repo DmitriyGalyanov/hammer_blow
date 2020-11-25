@@ -12,6 +12,8 @@ import {
 	Image,
 } from 'react-native';
 
+import Sound from 'react-native-sound';
+
 import {useSelector, useDispatch} from 'react-redux';
 import {
 	selectScoreData,
@@ -28,6 +30,8 @@ import hammer_mid from 'images/hammer_mid.png';
 import hammer_down from 'images/hammer_down.png';
 import coin from 'images/coin.png';
 
+const hammerBlowSound = new Sound(require('sounds/thick_stamp.wav'));
+
 
 function changeValueAnim(target, toValue, duration) {
 	Animated.timing(target, {
@@ -38,9 +42,9 @@ function changeValueAnim(target, toValue, duration) {
 };
 
 function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
+	min = Math.ceil(min);
+	max = Math.floor(max);
+	return Math.floor(Math.random() * (max - min)) + min;
 };
 
 export default function GameScreen() {
@@ -126,11 +130,23 @@ export default function GameScreen() {
 
 	const animStep = 200;
 
+	//play hammer blow sound
+	const playHammerBlowSound = () => {
+		console.log('test')
+		if (!soundData.isActive) return;
+		console.log('ssss')
+		hammerBlowSound.play();
+		console.log(hammerBlowSound)
+	};
+
 	const animHammerBlow = () => {
 		changeValueAnim(hammer_init_opacity, 0, animStep);
 		setTimeout(() => changeValueAnim(hammer_mid_opacity, 1, animStep), animStep);
 		setTimeout(() => changeValueAnim(hammer_mid_opacity, 0, animStep), animStep * 2);
-		setTimeout(() => changeValueAnim(hammer_down_opacity, 1, animStep), animStep * 3);
+		setTimeout(() => {
+			changeValueAnim(hammer_down_opacity, 1, animStep);
+			playHammerBlowSound();
+		}, animStep * 3);
 	};
 	const animHammerRevert = () => {
 		setIsBusy(true);
@@ -138,6 +154,8 @@ export default function GameScreen() {
 		changeValueAnim(hammer_mid_opacity, 0, animStep);
 		changeValueAnim(hammer_down_opacity, 0, animStep * 2);
 	};
+
+
 
 	//
 	const resetCoinPosition = () => {
