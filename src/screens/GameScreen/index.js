@@ -90,7 +90,7 @@ export default function GameScreen() {
 
 	useEffect(() => {
 		const greenLineAnimInterval = setInterval(() => {
-			console.log('Green Line Poisition: ', greenLinePosition, 'Coin Position:', coinPosition)
+			// console.log('Green Line Position: ', greenLinePosition, 'Coin Position:', coinPosition)
 			if (isStopped) return;
 			changeValueAnim(greenLinePosition, getRandomInt(0, playableAreaHeight), 300)
 		}, 300);
@@ -113,22 +113,7 @@ export default function GameScreen() {
 			console.log('fail');
 			return false;
 		}, 100);
-		// if (coinPosition.__getValue() - (coinDiameter * 0.95) <= greenLinePosition.__getValue()
-		// 	&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (greenLineHeight * 0.95)) {
-		// 	console.log('success');
-		// 	return true;
-		// }
-		// console.log('fail');
-		// return false;
 	};
-
-	// const handleSuccess = () => {
-	// 	console.log('going to handle...')
-	// 	if (checkIfSuccess()) { //is it allowed??
-	// 		console.log('handling///');
-	// 		dispatch(increaseScore({amount: 1}));
-	// 	};
-	// };
 
 	//hammer anim
 	const hammer_init_opacity = useRef(new Animated.Value(1)).current;
@@ -191,7 +176,10 @@ export default function GameScreen() {
 		}, animStep * 2.5);
 
 		setTimeout(() => {
+			console.log('checking')
+			console.log(checkIfSuccess())
 			if (checkIfSuccess()) {
+				console.log('yi')
 				dispatch(increaseScore({amount: 1}));
 			};
 			setIsBusy(false);

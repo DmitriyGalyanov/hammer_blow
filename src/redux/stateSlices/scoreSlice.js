@@ -9,6 +9,7 @@ export const scoreSlice = createSlice({
 	reducers: {
 		increaseScore: (state, action) => {
 			const {amount} = action.payload;
+			console.log(amount)
 			state.value = state.value + amount;
 		},
 
