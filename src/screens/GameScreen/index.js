@@ -19,6 +19,8 @@ import {
 } from 'state_slices/scoreSlice';
 import {selectSettingsData} from 'state_slices/settingsSlice';
 
+import {useNavigation} from '@react-navigation/native';
+
 import background from 'images/mainBackground.jpg';
 import gameImage from 'images/gameImage.png';
 import hammer_init from 'images/hammer_init.png';
@@ -43,6 +45,7 @@ function getRandomInt(min, max) {
 
 export default function GameScreen() {
 	const dispatch = useDispatch();
+	const navigation = useNavigation();
 
 	const {width: gameWidth} = Dimensions.get('window');
 
@@ -101,9 +104,9 @@ export default function GameScreen() {
 
 	//check if the line hits the coin
 	const checkIfSuccess = () => {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve, _) => {
 			setTimeout(() => {
-				console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`);
+				// console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`);
 				if (coinPosition.__getValue() - (greenLineHeight * 0.95) <= greenLinePosition.__getValue()
 					&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (coinDiameter * 0.95)) {
 					console.log('success');
@@ -114,7 +117,6 @@ export default function GameScreen() {
 				};
 			}, 100);
 		})
-
 	};
 
 	//hammer anim
@@ -158,6 +160,11 @@ export default function GameScreen() {
 		}, animStep * 4);
 	};
 
+	//handle fail
+	const handleFail = () => {
+		navigation.push('SecondaryMenu');
+	};
+
 	//smash handler
 	const handleSmash = async () => {
 		if (isBusy) return;
@@ -180,6 +187,7 @@ export default function GameScreen() {
 			// console.log('checking');
 			checkIfSuccess().then(isSuccess => {
 				if (isSuccess) dispatch(increaseScore({amount: 1}));
+				else handleFail();
 			});
 			setIsBusy(false);
 		}, animStep * 3);
