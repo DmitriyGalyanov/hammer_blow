@@ -1,15 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {
-	TouchableOpacity,
 	StyleSheet,
-	ImageBackground,
 	Vibration,
 	Dimensions,
+	TouchableOpacity,
+	ImageBackground,
 	Text,
-	Image,
 	View,
 	Animated,
+	Image,
 } from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
@@ -75,7 +75,6 @@ export default function GameScreen() {
 	};
 	const playableAreaHeight = playableAreaDims.top - playableAreaDims.bot;
 
-	// const coinPosition = useState(getRandomInt(0, playableAreaHeight)); //mb use opacity?
 	const coinPosition = useRef(new Animated.Value(getRandomInt(0, playableAreaHeight))).current;
 	const coinOpacity = useRef(new Animated.Value(1)).current;
 
@@ -90,7 +89,7 @@ export default function GameScreen() {
 
 	useEffect(() => {
 		const greenLineAnimInterval = setInterval(() => {
-			// console.log('Green Line Position: ', greenLinePosition, 'Coin Position:', coinPosition)
+			// console.log('Green Line Position: ', greenLinePosition, 'Coin Position:', coinPosition);
 			if (isStopped) return;
 			changeValueAnim(greenLinePosition, getRandomInt(0, playableAreaHeight), 300)
 		}, 300);
@@ -101,24 +100,10 @@ export default function GameScreen() {
 	}, [isStopped, isBusy]);
 
 	//check if the line hits the coin
-	// const checkIfSuccess = () => {
-	// 	// console.log(`${coinPosition.__getValue()} - (${coinDiameter} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${greenLineHeight} * 0.95)`)
-	// 	setTimeout(() => {
-	// 		console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`)
-	// 		if (coinPosition.__getValue() - (greenLineHeight * 0.95) <= greenLinePosition.__getValue()
-	// 			&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (coinDiameter * 0.95)) {
-	// 			console.log('success');
-	// 			return true;
-	// 		}
-	// 		console.log('fail');
-	// 		return false;
-	// 	}, 100);
-	// };
 	const checkIfSuccess = () => {
-		// console.log(`${coinPosition.__getValue()} - (${coinDiameter} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${greenLineHeight} * 0.95)`)
 		return new Promise((resolve, reject) => {
 			setTimeout(() => {
-				console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`)
+				console.log(`${coinPosition.__getValue()} - (${greenLineHeight} * 0.95) <= ${greenLinePosition.__getValue()} <= ${coinPosition.__getValue()} + (${coinDiameter} * 0.95)`);
 				if (coinPosition.__getValue() - (greenLineHeight * 0.95) <= greenLinePosition.__getValue()
 					&& greenLinePosition.__getValue() <= coinPosition.__getValue() + (coinDiameter * 0.95)) {
 					console.log('success');
@@ -167,7 +152,6 @@ export default function GameScreen() {
 		resetCoinPosition();
 		setTimeout(() => {
 			setIsStopped(false);
-			// setIsBusy(false);
 		}, animStep * 2);
 		setTimeout(() => {
 			setIsBusy(false);
@@ -193,12 +177,7 @@ export default function GameScreen() {
 		}, animStep * 2.5);
 
 		setTimeout(() => {
-			console.log('checking')
-			console.log(checkIfSuccess())
-			// if (checkIfSuccess()) {
-			// 	console.log('yi')
-			// 	dispatch(increaseScore({amount: 1}));
-			// };
+			// console.log('checking');
 			checkIfSuccess().then(isSuccess => {
 				if (isSuccess) dispatch(increaseScore({amount: 1}));
 			});
@@ -245,7 +224,6 @@ export default function GameScreen() {
 							position: 'absolute',
 							bottom: playableAreaDims.bot,
 							height: playableAreaHeight,
-							// backgroundColor: 'yellow',
 							width: playableAreaDims.width,
 						}
 					]}
@@ -288,7 +266,6 @@ export default function GameScreen() {
 						bottom: hammer_init_height + 40,
 						left: 20,
 					}}
-					
 				>
 					<Animated.View
 						style={{opacity: hammer_down_opacity}}
@@ -330,9 +307,7 @@ export default function GameScreen() {
 							}}
 						/>
 					</Animated.View>
-					
 				</View>
-
 			</ImageBackground>
 		</TouchableOpacity>
 	)
@@ -350,6 +325,5 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 	},
 
-	gameImage: {
-	}
+	gameImage: {},
 });
