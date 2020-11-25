@@ -1,10 +1,18 @@
 import React from 'react';
 
 import {
+	Vibration,
 	TouchableOpacity,
 	ImageBackground,
 	Image,
 } from 'react-native';
+
+import Sound from 'react-native-sound';
+
+import {useSelector} from 'react-redux';
+import {selectSettingsData} from 'state_slices/settingsSlice';
+
+const menu_selection_click = new Sound(require('sounds/menu_selection_click.wav'));
 
 
 export default function SquareButton({isActive, parameterName, onPress}) {
@@ -18,9 +26,33 @@ export default function SquareButton({isActive, parameterName, onPress}) {
 		? require('images/vibrationImage.png')
 		: require('images/soundImage.png');
 
+	const {
+		vibration: vibrationData,
+		sound: soundData,
+	} = useSelector(selectSettingsData);
+
+	const playSound = () => {
+		if (menu_selection_click.isPlaying()) return;
+		menu_selection_click.play();
+	};
+
+	const handlePress = () => {
+		onPress();
+		if (parameterName === 'vibration') {
+			if (!vibrationData.isActive) Vibration.vibrate(100);
+		} else {
+			if (vibrationData.isActive) Vibration.vibrate(100);
+		};
+		if (parameterName !== 'vibration') {
+			if (!soundData.isActive) playSound();
+		} else {
+			if (soundData.isActive) playSound();
+		};
+	};
+
 	return (
 		<TouchableOpacity
-			onPress={onPress}
+			onPress={handlePress}
 		>
 			<ImageBackground
 				source={background}

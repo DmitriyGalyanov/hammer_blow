@@ -28,7 +28,7 @@ const App = () => {
 		<Provider store={store}>
 			<NavigationContainer>
 				<Stack.Navigator
-					initialRouteName='Game'
+					initialRouteName='MainMenu'
 
 					screenOptions={{
 						header: () => null,

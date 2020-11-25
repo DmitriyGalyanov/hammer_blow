@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {selectScoreData} from 'state_slices/scoreSlice';
+import {selectScoreData, resetScore} from 'state_slices/scoreSlice';
 import {
 	selectSettingsData,
 	toggleVibration,
@@ -34,6 +34,11 @@ export default function MainMenuScreen() {
 		sound: soundData,
 	} = useSelector(selectSettingsData);
 
+	const handleStartNewGame = () => {
+		dispatch(resetScore());
+		navigation.push('Game');
+	};
+
 	return (
 		<ImageBackground
 			source={background}
@@ -47,7 +52,6 @@ export default function MainMenuScreen() {
 					{scoreCount}
 				</Text>
 			</ImageBackground>
-
 			<View style={styles.buttonsWrap}>
 				<View style={styles.settingsButtonsWrap}>
 					<SquareButton
@@ -63,9 +67,7 @@ export default function MainMenuScreen() {
 				</View>
 				<SimpleButton
 					title='Старт'
-					onPress={() => {
-						navigation.push('Game')
-					}}
+					onPress={handleStartNewGame}
 				/>
 			</View>
 		</ImageBackground>
