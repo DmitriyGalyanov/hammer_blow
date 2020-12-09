@@ -15,6 +15,12 @@
       <meta-data
         android:name="com.google.android.gms.ads.AD_MANAGER_APP"
         android:value="true"/>
+      <meta-data
+        android:name="com.facebook.sdk.ApplicationId"
+        android:value="@string/facebook_app_id"/>
+      <provider android:authorities="com.facebook.app.FacebookContentProvider1706185959559489"
+        android:name="com.facebook.FacebookContentProvider"
+        android:exported="true" />
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
