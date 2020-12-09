@@ -1,4 +1,4 @@
-package com.hammer_blow;
+package com.starrfun.app;
 
 import android.app.Application;
 import android.content.Context;

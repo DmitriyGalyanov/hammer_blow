@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "697322131872",
-    "firebase_url": "https://hammer-blow.firebaseio.com",
-    "project_id": "hammer-blow",
-    "storage_bucket": "hammer-blow.appspot.com"
+    "project_number": "777091314378",
+    "project_id": "star-wait-fun",
+    "storage_bucket": "star-wait-fun.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:697322131872:android:6e651e06e8f26f8b1c54c5",
+        "mobilesdk_app_id": "1:777091314378:android:5f1fc1af74f6c618e93a33",
         "android_client_info": {
-          "package_name": "com.hammer_blow"
+          "package_name": "com.starrfun.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "697322131872-2g293f87ja370akrgfno1d4cbp9v9gab.apps.googleusercontent.com",
+          "client_id": "777091314378-g51a3shlmrek990safcaa99j49tv4glp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDV998-izFPBCpvKLRVeWC8I5FYonwTM-Y"
+          "current_key": "AIzaSyAs6a_a0Lbi-NbIvYfKpC3wjv6ddnjUsNU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "697322131872-2g293f87ja370akrgfno1d4cbp9v9gab.apps.googleusercontent.com",
+              "client_id": "777091314378-g51a3shlmrek990safcaa99j49tv4glp.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

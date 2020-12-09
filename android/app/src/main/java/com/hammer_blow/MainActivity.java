@@ -1,4 +1,4 @@
-package com.hammer_blow;
+package com.starrfun.app;
 
 import com.facebook.react.ReactActivity;
 
